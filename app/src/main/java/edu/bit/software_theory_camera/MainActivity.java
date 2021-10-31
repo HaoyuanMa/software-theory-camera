@@ -8,6 +8,8 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
+    private int previewState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,4 +31,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
+
 }
