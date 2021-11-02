@@ -22,13 +22,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CameraActivity extends AppCompatActivity {
+    private Camera mCamera = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        Camera mCamera = getCameraInstance();
+        mCamera = getCameraInstance();
         if (mCamera == null){
             Toast.makeText(getApplicationContext(), "请授权应用使用相机！", Toast.LENGTH_SHORT).show();
             finish();
@@ -74,6 +75,7 @@ public class CameraActivity extends AppCompatActivity {
                 Log.d("mhy", "Error creating media file, check storage permissions");
                 return;
             }
+
 
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
