@@ -20,15 +20,34 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class CameraActivity extends AppCompatActivity {
+    private Camera mCamera = null;
+    private boolean capturing = false;
+    private Timer timer = new Timer();
+    private boolean lock = false;
+    private static int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        Camera mCamera = getCameraInstance();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Log.d("mhy","timerTask.run");
+                lock = true;
+                mCamera.takePicture(null,null,mPicture);
+                while (lock){
+
+                }
+            }
+        };
+
+        mCamera = getCameraInstance();
         if (mCamera == null){
             Toast.makeText(getApplicationContext(), "请授权应用使用相机！", Toast.LENGTH_SHORT).show();
             finish();
@@ -46,10 +65,20 @@ public class CameraActivity extends AppCompatActivity {
 
         Button capture = findViewById(R.id.button_capture);
         capture.setOnClickListener(v->{
-            mCamera.takePicture(null,null,mPicture);
+            Log.d("mhy","clicked");
+            if(capturing){
+                capturing = false;
+                Log.d("mhy","COUNT: "+ count);
+                timerTask.cancel();
+            } else {
+                capturing = true;
+                timer.schedule(timerTask,0,100);
+            }
         });
 
     }
+
+
 
 
     public static Camera getCameraInstance(){
@@ -68,23 +97,25 @@ public class CameraActivity extends AppCompatActivity {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
             File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null){
                 Log.d("mhy", "Error creating media file, check storage permissions");
                 return;
             }
 
+            Log.d("mhy","pic taken");
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
                 fos.close();
+                Log.d("mhy","pic saved");
             } catch (FileNotFoundException e) {
                 Log.d("mhy", "File not found: " + e.getMessage());
             } catch (IOException e) {
                 Log.d("mhy", "Error accessing file: " + e.getMessage());
             }
             camera.startPreview();
+            lock = false;
         }
     };
 
@@ -111,7 +142,7 @@ public class CameraActivity extends AppCompatActivity {
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
+                    "IMG_"+ timeStamp + "_" +count++ + ".jpg");
         } else if(type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "VID_"+ timeStamp + ".mp4");
