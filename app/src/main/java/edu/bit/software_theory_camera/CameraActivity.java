@@ -79,8 +79,6 @@ public class CameraActivity extends AppCompatActivity {
     }
 
 
-
-
     public static Camera getCameraInstance(){
         Camera c = null;
         try {
