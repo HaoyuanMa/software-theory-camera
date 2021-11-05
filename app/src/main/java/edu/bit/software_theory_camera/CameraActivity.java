@@ -120,16 +120,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
 
                     Log.d("mhy","pic taken");
-//                    try {
-//                        FileOutputStream fos = new FileOutputStream(pictureFile);
-//                        fos.write(data);
-//                        fos.close();
-//                        Log.d("mhy","pic saved");
-//                    } catch (FileNotFoundException e) {
-//                        Log.d("mhy", "File not found: " + e.getMessage());
-//                    } catch (IOException e) {
-//                        Log.d("mhy", "Error accessing file: " + e.getMessage());
-//                    }
+
 
                     OkHttpClient httpClient = new OkHttpClient();
                     RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"),data);
@@ -137,9 +128,10 @@ public class CameraActivity extends AppCompatActivity {
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("file", "head_img", fileBody)
                             .build();
-
+                    String url = "http://" + Config.getHost() + ":" + Config.getPort() + "/upload";
+                    Log.d("mhy",url);
                     Request request = new Request.Builder()
-                            .url("http://10.20.16.237:8080/upload")
+                            .url(url)
                             .post(requestBody)
                             .build();
                     Call call = httpClient.newCall(request);
