@@ -1,8 +1,8 @@
 package edu.bit.software_theory_camera;
 
 public class Config {
-    private static String host = "10.0.2.2";
-    private static String port = "5000";
+    private static String host = "10.20.16.237";
+    private static String port = "8080";
 
     public static String getHost() {
         return host;

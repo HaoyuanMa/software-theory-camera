@@ -98,7 +98,9 @@ public class CameraHelper {
         params.setPreviewFpsRange(minFps[0],minFps[1]);
         params.setJpegQuality(CameraProfile.QUALITY_LOW);
         params.setPictureSize(minSizeW,minSizeH);
+        params.setRotation(270);
         mCamera.setParameters(params);
+        mCamera.setDisplayOrientation(90);
     }
 
     public static void freeCamera(Camera camera){

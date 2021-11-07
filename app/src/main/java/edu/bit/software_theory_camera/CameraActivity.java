@@ -10,6 +10,9 @@ import static edu.bit.software_theory_camera.CameraHelper.getCount;
 import static edu.bit.software_theory_camera.CameraHelper.getOutputMediaFile;
 import static edu.bit.software_theory_camera.CameraHelper.setUpCamera;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.media.CameraProfile;
 import android.os.Environment;
@@ -25,6 +28,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -101,7 +105,7 @@ public class CameraActivity extends AppCompatActivity {
                         }
                     }
                 };
-                timer.schedule(timerTask,0,1000);
+                timer.schedule(timerTask,0,500);
             }
         });
     }
@@ -110,14 +114,13 @@ public class CameraActivity extends AppCompatActivity {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+
+
+
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-                    if (pictureFile == null){
-                        Log.d("mhy", "Error creating media file, check storage permissions");
-                        return;
-                    }
 
                     Log.d("mhy","pic taken");
 
@@ -128,7 +131,7 @@ public class CameraActivity extends AppCompatActivity {
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("file", "head_img", fileBody)
                             .build();
-                    String url = "http://" + Config.getHost() + ":" + Config.getPort() + "/upload";
+                    String url = "http://" + Config.getHost() + ":" + Config.getPort() + "/CameraUpload";
                     Log.d("mhy",url);
                     Request request = new Request.Builder()
                             .url(url)
