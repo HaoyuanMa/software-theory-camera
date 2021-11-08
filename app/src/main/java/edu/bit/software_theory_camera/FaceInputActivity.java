@@ -34,23 +34,25 @@ import okhttp3.Response;
 public class FaceInputActivity extends AppCompatActivity {
 
     private Camera mCamera = null;
-
+    private String res = "";
     private boolean lock = false;
     CameraPreview mPreview = null;
 
-    private int order = 1;
     private int id = 0;
-    private int FINISH = 1;
+    private final int FINISH = 1;
 
     private Handler resultHandler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
                 super.handleMessage(msg);
+
                 if(msg.what == FINISH){
+                    findViewById(R.id.button_submit).setActivated(true);
                     ResultDialog resultDialog = new ResultDialog(mPreview.getContext());
                     resultDialog.show();
                 }
         }
+
     };
 
     @Override
@@ -85,24 +87,41 @@ public class FaceInputActivity extends AppCompatActivity {
             }
 
             Log.d("mhy","clicked,id= " + id);
-            order = 1;
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (int i = 0; i < 10; i++) {
+                    while (!res.equals("11")){
                         lock = true;
                         mCamera.takePicture(null,null,mPicture);
                         while (lock){
 
                         }
-                        order++;
                     }
-                    v.setActivated(true);
+
+                    OkHttpClient httpClient = new OkHttpClient();
+                    String url = "http://" + Config.HOST + ":" + Config.PORT + Config.FACE_INPUT_RECOGNISE_URL + "?id=" + id;
+                    Request request = new Request.Builder()
+                            .get()
+                            .url(url)
+                            .build();
+                    Call call = httpClient.newCall(request);
+
+                    try {
+                        //同步请求，要放到子线程执行
+                        Response response = call.execute();
+                        Log.i("mhy", "okHttpGet run: response:"+ response.body().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     Message message = new Message();
                     message.what = FINISH;
                     resultHandler.sendMessage(message);
+
                 }
             }).start();
+
         });
 
     }
@@ -133,15 +152,14 @@ public class FaceInputActivity extends AppCompatActivity {
 
                     Log.d("mhy","pic taken");
 
-
                     OkHttpClient httpClient = new OkHttpClient();
                     RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"),data);
                     RequestBody requestBody = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
-                            .addFormDataPart("file", "head_img_" + order, fileBody)
+                            .addFormDataPart("file", id + "", fileBody)
                             .build();
 
-                    String url = "http://" + Config.getHost() + ":" + Config.getPort() + "/upload" + "?id=" + id + "&order=" + order;
+                    String url = "http://" + Config.HOST + ":" + Config.PORT + Config.FACE_INPUT_UPLOAD_URL;
                     Request request = new Request.Builder()
                             .url(url)
                             .post(requestBody)
@@ -151,7 +169,8 @@ public class FaceInputActivity extends AppCompatActivity {
                     try {
                         //同步请求，要放到子线程执行
                         Response response = call.execute();
-                        Log.i("mhy", "okHttpGet run: response:"+ response.body().string());
+                        res = response.body().string();
+                        Log.i("mhy", "okHttpGet run: response:"+ res);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

@@ -114,16 +114,11 @@ public class CameraActivity extends AppCompatActivity {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
-
-
-
             new Thread(new Runnable() {
                 @Override
                 public void run() {
 
                     Log.d("mhy","pic taken");
-
 
                     OkHttpClient httpClient = new OkHttpClient();
                     RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"),data);
@@ -131,7 +126,7 @@ public class CameraActivity extends AppCompatActivity {
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("file", "head_img", fileBody)
                             .build();
-                    String url = "http://" + Config.getHost() + ":" + Config.getPort() + "/CameraUpload";
+                    String url = "http://" + Config.HOST + ":" + Config.PORT + Config.CAMERA_UPLOAD_URL;
                     Log.d("mhy",url);
                     Request request = new Request.Builder()
                             .url(url)
